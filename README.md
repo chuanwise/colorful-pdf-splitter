@@ -19,11 +19,7 @@
 脚本 `main.py` 有 N 个位置参数，每个为一个 PDF 文件。
 
 对于输入的每一个 PDF 文件 `foo.py`，系统将输出两个 PDF：`foo-COLOR.pdf` 和 `foo-BW.pdf`，分别包含需要彩打的页和需要黑白打印的页。
-默认输出到该文档所在的相同目录下。若希望输出到指定目录，可以使用 `--out` 或 `-o` 参数。
-若输出目录不存在会被自动创建。若这些文件已经存在，则程序将提出警告，并要求输入 `y` 来覆盖它们，或输入 `n` 来跳过该文件的处理。若
-PDF 读取失败，则程序将输出错误信息，并跳过该文件的处理。
-
-下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
+默认输出到该文档所在的相同目录下。下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
 
 ### 双页打印模式（默认）
 
@@ -45,16 +41,19 @@ python main.py --single-page docs/examples/SamplePDF-500kb-Text-Images-Links-9Pa
 
 ## 进阶
 
-### 自动确认覆盖 (-y)
+### 自动处理文件覆盖冲突 (`-y` / `-n`)
 
-如果是批量跑脚本不想频繁按回车，或者你正将此脚本集成进其他全自动的工作流中，您可以加入 `-y` (或 `--yes`)
-标志。所有原本需要人工确认才能覆盖前次同名拆分结果的情况都会默认强行覆盖：
+如果您需要进行批量化脚本调用（例如集成在完全自动化的工作流中），为了防止程序在遇到重名结果文件时阻塞等待输入，您可以使用以下标志：
+
+- `-y` (或 `--yes`)：自动确认覆盖已经存在的拆分结果文件。
+- `-n` (或 `--no`)：自动拒绝覆盖，当遇到已存在同名输出文件时直接跳过这个 PDF 的处理。
 
 ```bash
-python main.py -y docs/examples/SamplePDF-500kb-Text-Images-Links-9Pages.pdf
+# 例子：若发现文件已存在，则自动跳过
+python main.py -n docs/examples/SamplePDF-500kb-Text-Images-Links-9Pages.pdf
 ```
 
-### 指定输出文件夹 - `--out`
+### 指定输出文件夹 (`--out`)
 
 使用 `--out` 或 `-o` 指定拆分后的 PDF 文件存放位置。如果文件夹不存在将被自动创建。
 
@@ -64,7 +63,7 @@ python main.py --out output/ docs/examples/SamplePDF-500kb-Text-Images-Links-9Pa
 
 由于程序是通过将 PDF 页面渲染为图像，并比较原图与灰度图的差异来判断是否包含彩色内容，在某些极端情况下（如有微小的高压缩噪声色块），你可能会需要调整检测的精度参数。
 
-### DPI - `--dpi`
+### DPI (`--dpi`)
 
 指定渲染页面以进行色彩检测时使用的内部 DPI，默认为 `36`。
 可以将其调高以获得更精确的细节判定（例如检测极小的彩色文字），但会显著增加处理时间和系统内存的占用：
@@ -75,7 +74,7 @@ python main.py --dpi 72 docs/examples/SamplePDF-500kb-Text-Images-Links-9Pages.p
 
 > **注意**：该 DPI 仅用来判断页面是否是彩色，**不会**影响最终导出的 PDF 的清晰度（输出的 PDF 是无损的逻辑切分，可以保留完美的矢量效果和原图画质）。
 
-### 色彩阈值 - `--threshold`
+### 色彩阈值 (`--threshold`)
 
 原图相较于灰度图在 RGB 颜色通道上的容差容忍值，默认为 `5` (范围 0-255)。
 

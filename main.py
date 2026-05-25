@@ -89,7 +89,7 @@ def get_page_splits(num_pages, color_pages, single_page=False):
     return final_color_pages, final_bw_pages
 
 
-def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5, auto_yes=False):
+def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5, auto_yes=False, auto_no=False):
     dirname, basename = os.path.split(file_path)
     name, ext = os.path.splitext(basename)
 
@@ -105,7 +105,10 @@ def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5,
     bw_pdf_path = os.path.join(out_dir_path, f"{name}-BW.pdf")
 
     if os.path.exists(color_pdf_path) or os.path.exists(bw_pdf_path):
-        if not auto_yes:
+        if auto_no:
+            print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。跳过处理: {file_path}")
+            return
+        elif not auto_yes:
             print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。")
             ans = input(f"是否覆盖这些文件？(y/n) [n]: ")
             if ans.strip().lower() != 'y':
@@ -155,6 +158,7 @@ def main():
     parser.add_argument("--dpi", type=int, default=36, help="解析 PDF 使得页面进行渲染时的 DPI，默认为 36。越大越慢越准。")
     parser.add_argument("--threshold", type=int, default=5, help="非灰度判断的亮度阈值，默认为 5。超过该阈值的差异点视为彩色。")
     parser.add_argument("-y", "--yes", action="store_true", help="自动确认覆盖已存在的文件")
+    parser.add_argument("-n", "--no", action="store_true", help="自动拒绝覆盖已存在的文件并跳过")
 
     args = parser.parse_args()
 
@@ -168,7 +172,8 @@ def main():
             out_dir=args.out,
             dpi=args.dpi,
             threshold=args.threshold,
-            auto_yes=args.yes
+            auto_yes=args.yes,
+            auto_no=args.no
         )
 
 
