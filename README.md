@@ -5,7 +5,7 @@
 
 ```mermaid
 graph LR
-    A2[原 PDF 文档] -->|使用 Colorful PDF Splitter| B2{自动分析截取}
+    A2[原 PDF 文档] --> B2{自动分析截取}
     B2 -->|拆分出彩页部分| C2(COLOR.pdf)
     B2 -->|拆分出黑白部分| D2(BW.pdf)
     C2 -->|彩色单价打印| E2(少量彩打纸张)
