@@ -16,7 +16,7 @@
 
 ## 快速开始
 
-脚本 `main.py` 有 N 个位置参数，每个为一个 PDF 文件。
+脚本 `main.py` 的每一个参数都是一个 PDF 文件路径。
 
 对于输入的每一个 PDF 文件 `foo.py`，系统将输出两个 PDF：`foo-COLOR.pdf` 和 `foo-BW.pdf`，分别包含需要彩打的页和需要黑白打印的页。
 默认输出到该文档所在的相同目录下。下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
