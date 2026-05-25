@@ -4,7 +4,7 @@
 文件的工具，能够将彩色页和黑白页分开，从而帮助用户节省打印成本。
 
 ```mermaid
-graph TD
+graph LR
     A2[原 PDF 文档] -->|使用 Colorful PDF Splitter| B2{自动分析截取}
     B2 -->|拆分出彩页部分| C2(COLOR.pdf)
     B2 -->|拆分出黑白部分| D2(BW.pdf)
