@@ -89,7 +89,7 @@ def get_page_splits(num_pages, color_pages, single_page=False):
     return final_color_pages, final_bw_pages
 
 
-def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5, auto_yes=False, auto_no=False):
+def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5, auto_yes=False, auto_no=False, dry_run=False):
     dirname, basename = os.path.split(file_path)
     name, ext = os.path.splitext(basename)
 
@@ -98,22 +98,23 @@ def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5,
         return
 
     out_dir_path = out_dir if out_dir else dirname
-    if out_dir_path and not os.path.exists(out_dir_path):
-        os.makedirs(out_dir_path, exist_ok=True)
-
     color_pdf_path = os.path.join(out_dir_path, f"{name}-COLOR.pdf")
     bw_pdf_path = os.path.join(out_dir_path, f"{name}-BW.pdf")
 
-    if os.path.exists(color_pdf_path) or os.path.exists(bw_pdf_path):
-        if auto_no:
-            print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。跳过处理: {file_path}")
-            return
-        elif not auto_yes:
-            print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。")
-            ans = input(f"是否覆盖这些文件？(y/n) [n]: ")
-            if ans.strip().lower() != 'y':
-                print(f"跳过处理: {file_path}")
+    if not dry_run:
+        if out_dir_path and not os.path.exists(out_dir_path):
+            os.makedirs(out_dir_path, exist_ok=True)
+
+        if os.path.exists(color_pdf_path) or os.path.exists(bw_pdf_path):
+            if auto_no:
+                print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。跳过处理: {file_path}")
                 return
+            elif not auto_yes:
+                print(f"警告：文件 '{color_pdf_path}' 或 '{bw_pdf_path}' 已存在。")
+                ans = input(f"是否覆盖这些文件？(y/n) [n]: ")
+                if ans.strip().lower() != 'y':
+                    print(f"跳过处理: {file_path}")
+                    return
 
     try:
         with fitz.open(file_path) as doc:
@@ -127,15 +128,16 @@ def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5,
 
             final_color_pages, final_bw_pages = get_page_splits(num_pages, color_pages, single_page)
 
-        if len(final_color_pages) > 0:
-            with fitz.open(file_path) as color_doc:
-                color_doc.select(sorted(list(final_color_pages)))
-                color_doc.save(color_pdf_path)
+        if not dry_run:
+            if len(final_color_pages) > 0:
+                with fitz.open(file_path) as color_doc:
+                    color_doc.select(sorted(list(final_color_pages)))
+                    color_doc.save(color_pdf_path)
 
-        if len(final_bw_pages) > 0:
-            with fitz.open(file_path) as bw_doc:
-                bw_doc.select(sorted(list(final_bw_pages)))
-                bw_doc.save(bw_pdf_path)
+            if len(final_bw_pages) > 0:
+                with fitz.open(file_path) as bw_doc:
+                    bw_doc.select(sorted(list(final_bw_pages)))
+                    bw_doc.save(bw_pdf_path)
 
     except Exception as e:
         print(f"处理 PDF 失败: {file_path}，错误信息: {e}")
@@ -144,7 +146,7 @@ def process_pdf(file_path, single_page=False, out_dir=None, dpi=36, threshold=5,
     color_pages_1_based = [p + 1 for p in final_color_pages]
     bw_pages_1_based = [p + 1 for p in final_bw_pages]
 
-    print(f"处理完成: {file_path}")
+    print(f"处理完成: {file_path}" + (" (Dry Run)" if dry_run else ""))
     print(f"  总页面数: {num_pages}")
     print(f"  彩色页面: {len(final_color_pages)} ({format_page_ranges(color_pages_1_based)})")
     print(f"  黑白页面: {len(final_bw_pages)} ({format_page_ranges(bw_pages_1_based)})")
@@ -159,6 +161,7 @@ def main():
     parser.add_argument("--threshold", type=int, default=5, help="非灰度判断的亮度阈值，默认为 5。超过该阈值的差异点视为彩色。")
     parser.add_argument("-y", "--yes", action="store_true", help="自动确认覆盖已存在的文件")
     parser.add_argument("-n", "--no", action="store_true", help="自动拒绝覆盖已存在的文件并跳过")
+    parser.add_argument("--dry-run", action="store_true", help="演练运行，只统计彩色页信息，不实际生成文件")
 
     args = parser.parse_args()
 
@@ -173,7 +176,8 @@ def main():
             dpi=args.dpi,
             threshold=args.threshold,
             auto_yes=args.yes,
-            auto_no=args.no
+            auto_no=args.no,
+            dry_run=args.dry_run
         )
 
 

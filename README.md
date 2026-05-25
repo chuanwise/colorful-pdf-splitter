@@ -3,6 +3,25 @@
 彩色文件打印往往按页计费，价格高昂。尤其是到了毕业季，自行打印大论文，价格更是令人肉疼。Colorful PDF Splitter 是分割 PDF
 文件的工具，能够将彩色页和黑白页分开，从而帮助用户节省打印成本。
 
+```mermaid
+graph TD
+    subgraph 传统流程 - 整体彩打
+        A1[原 PDF 文档] -->|直接发送| B1(打印店彩印机)
+        B1 -->|整本按彩色单价计费| C1[💸 极其昂贵的打印费]
+    end
+
+    subgraph 我们的流程 - 智能拆分拼合
+        A2[原 PDF 文档] -->|使用 Colorful PDF Splitter| B2{自动分析截取}
+        B2 -->|拆分出彩页部分| C2(COLOR.pdf)
+        B2 -->|拆分出黑白部分| D2(BW.pdf)
+        C2 -->|彩色单价打印| E2(少量彩打纸张)
+        D2 -->|黑白单价打印| F2(大量黑白纸张)
+        E2 --> G2((手工拼合装订))
+        F2 --> G2
+        G2 --> H2[🎓 巨省钱地拿到整本文件！]
+    end
+```
+
 ## 背景
 
 在许多场景下（比如毕业季打印动辄上百页的大论文），如果不予报销，自行去打印店彩打的价格是非常昂贵的。
@@ -19,10 +38,18 @@
 
 ## 快速开始
 
-脚本 `main.py` 的每一个参数都是一个 PDF 文件路径。
+### 打印工作流改变
 
-对于输入的每一个 PDF 文件 `foo.py`，系统将输出两个 PDF：`foo-COLOR.pdf` 和 `foo-BW.pdf`，分别包含需要彩打的页和需要黑白打印的页。
-默认输出到该文档所在的相同目录下。下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
+原来（直接打印整本）：
+👉 发送原 PDF 给打印机 👉 **打印店把整本作为全彩输出计算高昂单价**
+
+现在的新工作流：
+1. **输入 PDF** 给 `colorful-pdf-splitter` 检测并拆分彩页。
+2. **获取输出**：得到两个 PDF 文件，分别是彩色页和黑白页。
+3. **分别打印**：用彩色打印机打印彩色页 PDF，用黑白打印机打印黑白页 PDF。
+4. **手工拼合**：将彩色页按顺序插入黑白页中，完成整本文件的拼合。
+
+下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
 
 ### 双页打印模式（默认）
 
@@ -54,6 +81,15 @@ python main.py --single-page docs/examples/SamplePDF-500kb-Text-Images-Links-9Pa
 ```bash
 # 例子：若发现文件已存在，则自动跳过
 python main.py -n docs/examples/SamplePDF-500kb-Text-Images-Links-9Pages.pdf
+```
+
+### 演练运行 (`--dry-run`)
+
+如果您并不想现在就耗费时间去保存输出文件（例如对于几GB或上百页体量的大书），只想立刻知道它统计出的彩色页码范围是什么（或者只用来辅助决定该单独用 Word 打哪些页），你可以加上 `--dry-run`。
+加入该标志后，程序将仅仅去检测和输出统计结果（即打印在控制台上的那些 `彩色排布: 1-5, 8` 等），绝对不会写入、覆盖任何文件或文件夹。
+
+```bash
+python main.py --dry-run docs/examples/SamplePDF-500kb-Text-Images-Links-9Pages.pdf
 ```
 
 ### 指定输出文件夹 (`--out`)
