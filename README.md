@@ -31,7 +31,9 @@ graph LR
 
 ## 快速开始
 
-请先使用 `pip install -r requirements.txt` 安装所需依赖。随后在项目文件夹下执行命令以使用此工具。下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
+请先使用 `pip install -r requirements.txt` 安装所需依赖。随后在项目文件夹下执行命令以使用此工具。执行完的下面的命令后，您将在 PDF 目录下看到文件名称后缀为 `-BW.pdf` 和 `-COLOR.pdf` 的两个新文件，它们是需要分别黑白或彩色打印的文件。如果需要全彩打印或全黑白打印，则只生成一个文件；若 PDF 为空，则不会生成任何文件。
+
+下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
 
 ### 双页打印模式（默认）
 
