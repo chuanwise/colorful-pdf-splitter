@@ -31,7 +31,7 @@ graph LR
 
 ## 快速开始
 
-下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
+请先使用 `pip install -r requirements.txt` 安装所需依赖。随后在项目文件夹下执行命令以使用此工具。下面以从 [File Format 网站下载的示例 PDF](https://docs.fileformat.com/pdf/download-pdf/) 为例，来展示两种模式的使用方法。
 
 ### 双页打印模式（默认）
 
